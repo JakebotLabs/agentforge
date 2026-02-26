@@ -1,0 +1,18 @@
+version: "1"
+platform: openclaw  # openclaw | langchain | standalone
+
+workspace: ~/.openclaw/workspace
+
+memory:
+  enabled: true
+  path: ~/.openclaw/workspace/vector_memory
+
+healthkit:
+  enabled: true
+  path: ~/.openclaw/workspace/healthkit_internal
+  mode: observe  # observe | heal
+
+dashboard:
+  enabled: true
+  host: 127.0.0.1
+  port: 7842

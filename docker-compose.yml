@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  dashboard:
+    build:
+      context: ../jakebot-dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "7842:7842"
+    volumes:
+      - agentforge-data:/data
+      - ${HOME}/.openclaw/workspace:/workspace:ro
+    environment:
+      - JAKEBOT_DASHBOARD_HOST=0.0.0.0
+      - JAKEBOT_DASHBOARD_WORKSPACE_PATH=/workspace
+    restart: unless-stopped
+
+volumes:
+  agentforge-data:
