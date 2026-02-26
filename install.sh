@@ -144,7 +144,6 @@ export PATH="$LOCAL_BIN:$PATH"
 
 # ── 5. Initialize ─────────────────────────────────────────────
 echo ""
-echo "🚀 Initializing AgentForge..."
 "$LOCAL_BIN/agentforge" init --platform "$PLATFORM" --no-install
 
 # ── 6. Verify ─────────────────────────────────────────────────

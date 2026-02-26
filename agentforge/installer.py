@@ -78,7 +78,7 @@ def install_components(config: AgentForgeConfig) -> dict:
     # Check healthkit
     healthkit_path = config.healthkit.path
     if healthkit_path.exists() and (healthkit_path / "monitor.py").exists():
-        results["agent-healthkit"] = {"installed": True, "message": f"Found at {healthkit_path}"}
+        results["agent-healthkit"] = {"installed": True, "message": f"Found at {str(healthkit_path).strip()}"}
     else:
         results["agent-healthkit"] = {"installed": False, "message": "Not found."}
     
@@ -109,7 +109,7 @@ def install_components(config: AgentForgeConfig) -> dict:
     else:
         results["pipeline"] = {
             "installed": None,  # Not an error — Pro feature
-            "message": "🔒 Pro feature — github.com/sponsors/Jakebot-ops",
+            "message": "Pro feature — github.com/sponsors/Jakebot-ops",
         }
     
     return results
