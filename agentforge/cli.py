@@ -5,7 +5,7 @@ from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 from .config import load_config, save_config, AgentForgeConfig, DEFAULT_CONFIG_PATH
-from .installer import install_components, check_components
+from .installer import install_components, check_components, install_all_components
 from .runner import start_services, stop_services, get_status
 
 console = Console()
@@ -21,25 +21,47 @@ def cli():
 @cli.command()
 @click.option("--platform", type=click.Choice(["openclaw", "langchain", "standalone"]), default="openclaw")
 @click.option("--workspace", type=click.Path(), default=None)
-def init(platform: str, workspace: str):
+@click.option("--install/--no-install", default=True, help="Install all components")
+def init(platform: str, workspace: str, install: bool):
     """Initialize AgentForge in the current environment."""
     console.print("[bold blue]⚒️  Initializing AgentForge...[/]")
     
     config = AgentForgeConfig(platform=platform)
-    if workspace:
-        config.workspace = Path(workspace)
+    workspace_path = Path(workspace) if workspace else Path.home() / ".agentforge"
+    config.workspace = workspace_path
     
-    # Check/install components
-    results = install_components(config)
+    # Update config defaults to point to components subdirectories
+    config.memory.path = workspace_path / "components" / "persistent-memory"
+    config.healthkit.path = workspace_path / "components" / "agent-healthkit"
     
-    for component, status in results.items():
-        icon = "✅" if status["installed"] else "❌"
-        console.print(f"  {icon} {component}: {status['message']}")
+    # Install components if requested
+    if install:
+        results = install_all_components(config, console)
+        for component, status in results.items():
+            icon = "✅" if status["installed"] else "❌"
+            console.print(f"  {icon} {component}: {status['message']}")
+    else:
+        # Just check components
+        results = install_components(config)
+        for component, status in results.items():
+            icon = "✅" if status["installed"] else "❌"
+            console.print(f"  {icon} {component}: {status['message']}")
     
     save_config(config)
     console.print(f"\n[green]✓ Config saved to {DEFAULT_CONFIG_PATH}[/]")
     console.print("[green]✓ AgentForge initialized![/]")
     console.print("\nRun [bold]agentforge start[/] to launch all services.")
+
+
+@cli.command()
+def install():
+    """Install or update all AgentForge components."""
+    config = load_config()
+    console.print("[bold blue]📦 Installing AgentForge components...[/]")
+    results = install_all_components(config, console)
+    for name, status in results.items():
+        icon = "✅" if status["installed"] else "❌"
+        console.print(f"  {icon} {name}: {status['message']}")
 
 
 @cli.command()

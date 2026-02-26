@@ -6,6 +6,7 @@ Tracking issues hit on fresh Ubuntu 24.04 (agentforge-tester1 VM).
 
 | Step | Issue | Fix |
 |------|-------|-----|
+| 0 | curl not installed | `sudo apt install curl` |
 | 1 | pip not installed | `sudo apt install python3-pip` |
 | 2 | venv not available | `sudo apt install python3.12-venv` |
 | 3 | "externally-managed-environment" | Must use venv (can't pip install globally) |

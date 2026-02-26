@@ -6,6 +6,51 @@ import sys
 from .config import AgentForgeConfig
 
 
+def install_all_components(config: AgentForgeConfig, console) -> dict:
+    """Clone and set up all AgentForge components."""
+    results = {}
+    components_dir = Path(config.workspace) / "components"
+    components_dir.mkdir(parents=True, exist_ok=True)
+    
+    REPOS = {
+        "persistent-memory": "https://github.com/Jakebot-ops/persistent-memory.git",
+        "agent-healthkit": "https://github.com/Jakebot-ops/agent-healthkit.git",
+        "jakebot-dashboard": "https://github.com/Jakebot-ops/jakebot-dashboard.git",
+    }
+    
+    for name, url in REPOS.items():
+        target = components_dir / name
+        console.print(f"  📦 Installing {name}...")
+        
+        if target.exists():
+            # Update existing
+            result = subprocess.run(["git", "-C", str(target), "pull"], 
+                                  capture_output=True, text=True)
+            results[name] = {"installed": True, "message": "Updated"}
+        else:
+            # Clone new
+            result = subprocess.run(["git", "clone", url, str(target)],
+                                  capture_output=True, text=True)
+            if result.returncode == 0:
+                results[name] = {"installed": True, "message": "Cloned"}
+            else:
+                results[name] = {"installed": False, "message": result.stderr[:100]}
+        
+        # Set up Python venv for each component if requirements.txt exists
+        req_file = target / "requirements.txt"
+        if req_file.exists():
+            venv_path = target / "venv"
+            if not venv_path.exists():
+                subprocess.run([sys.executable, "-m", "venv", str(venv_path)],
+                             capture_output=True)
+            pip = venv_path / "bin" / "pip"
+            subprocess.run([str(pip), "install", "-q", "-r", str(req_file)],
+                         capture_output=True)
+            console.print(f"    ✅ {name} dependencies installed")
+    
+    return results
+
+
 def install_components(config: AgentForgeConfig) -> dict:
     """Check and install AgentForge components."""
     results = {}
