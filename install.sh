@@ -95,12 +95,16 @@ mkdir -p "$AGENTFORGE_HOME"
 # Clone or update
 if [[ -d "$AGENTFORGE_HOME/repo/.git" ]]; then
     info "Updating existing installation..."
-    git -C "$AGENTFORGE_HOME/repo" pull -q
+    git -C "$AGENTFORGE_HOME/repo" fetch -q origin
+    git -C "$AGENTFORGE_HOME/repo" reset -q --hard origin/main
 else
     info "Cloning repository..."
     git clone -q "$REPO_URL" "$AGENTFORGE_HOME/repo"
+    # Ensure latest (CDN cache can serve stale clone)
+    git -C "$AGENTFORGE_HOME/repo" fetch -q origin
+    git -C "$AGENTFORGE_HOME/repo" reset -q --hard origin/main
 fi
-ok "Repository ready"
+ok "Repository ready ($(git -C "$AGENTFORGE_HOME/repo" rev-parse --short HEAD))"
 
 # Python venv
 info "Setting up Python environment..."
