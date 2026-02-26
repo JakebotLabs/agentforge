@@ -1,0 +1,58 @@
+# AgentForge Cluster Configuration Example
+# Copy this file and customize for your setup.
+#
+# Full schema: https://agentsforge.dev/docs/cluster-schema
+# API endpoint: GET /api/v1/cluster/schema
+
+cluster_id: "my-production-cluster"
+
+# Orchestration settings
+orchestration:
+  version: "2026.1-compat"
+  
+  # Global anchors are identity files loaded into every agent's context
+  global_anchors:
+    - path: "./SOUL.md"
+      priority: high
+      persistence: locked    # locked = never evicted from context
+    
+    - path: "./AGENTS.md"
+      priority: high
+      persistence: locked
+
+# Agent definitions
+agents:
+  # Primary agent - main orchestrator
+  - id: "main"
+    identity_path: "./SOUL.md"
+    memory_buffer: 8192        # Max tokens for this agent's memory
+    context_isolation: true    # Separate context window
+  
+  # Code-focused sub-agent
+  - id: "codebot"
+    identity_path: "./bots/codebot/IDENTITY.md"
+    memory_buffer: 4096
+    context_isolation: true
+  
+  # Review sub-agent
+  - id: "reviewer"
+    identity_path: "./bots/reviewer/IDENTITY.md"
+    memory_buffer: 2048
+    context_isolation: false   # Shares context with main
+
+# Sync protocol between agents
+sync_protocol:
+  mode: "differential"         # Only sync changes, not full state
+  frequency: "real-time"       # Options: real-time | periodic | manual
+
+# Health monitoring configuration
+health_check:
+  # Automatically fix memory overflow by trimming old entries
+  auto_fix_overflow: true
+  
+  # Alert when identity files become too small relative to context
+  alert_on_soul_drift: true
+  
+  # Alert threshold: identity_tokens / total_tokens
+  # 0.15 = alert if identity files drop below 15% of context
+  soul_drift_threshold: 0.15

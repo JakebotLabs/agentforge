@@ -1,0 +1,62 @@
+{
+  "name": "@agentsforge/healthkit",
+  "version": "0.1.0",
+  "description": "Health monitoring and cluster management for AI agents. Monitor soul drift, manage multi-agent clusters, and ensure agent identity preservation.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "cluster.example.yaml"
+  ],
+  "scripts": {
+    "build": "tsc && tsc -p tsconfig.esm.json",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"No tests yet\" && exit 0",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "health-monitoring",
+    "cluster-management",
+    "soul-drift",
+    "agentsforge",
+    "openclaw",
+    "langchain",
+    "autogen"
+  ],
+  "author": "Jakebot Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jakebot-ops/agentforge"
+  },
+  "homepage": "https://agentsforge.dev",
+  "bugs": {
+    "url": "https://github.com/Jakebot-ops/agentforge/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.2",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "yaml": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "yaml": {
+      "optional": true
+    }
+  }
+}
