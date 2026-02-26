@@ -16,8 +16,9 @@ curl -fsSL https://agentsforge.dev/install.sh | bash
 | Layer | Description | Status |
 |-------|-------------|--------|
 | 🧠 **Memory** | ChromaDB vectors + NetworkX knowledge graph | ✅ Free |
-| 🩺 **Health** | Auto-monitoring + self-healing | ✅ Free |
+| 🩺 **Health** | Auto-monitoring + self-healing + soul drift detection | ✅ Free |
 | 📊 **Dashboard** | Web UI for memory & health management | ✅ Free |
+| 🔧 **NPM Package** | TypeScript client: `@agentsforge/healthkit` | ✅ Free |
 | ⚙️ **Dev Pipeline** | CodeBot + OpusBot autonomous coding | 🔐 [Pro](https://github.com/sponsors/Jakebot-ops) |
 
 ## Quick Start
@@ -84,6 +85,29 @@ dashboard:
 - Autonomous code writing and review
 - Private repo access
 - Priority support
+
+## TypeScript/JavaScript SDK
+
+Use AgentForge health monitoring from Node.js or browser:
+
+```bash
+npm install @agentsforge/healthkit
+```
+
+```typescript
+import { HealthKit, ClusterManager } from '@agentsforge/healthkit';
+
+// Monitor cluster health
+const kit = new HealthKit();
+const status = await kit.getStatus();
+console.log(status.drift_risk);  // "0%"
+
+// Manage clusters
+const cluster = new ClusterManager(config);
+await cluster.deploy();
+```
+
+See [@agentsforge/healthkit on npm](https://www.npmjs.com/package/@agentsforge/healthkit) for full docs.
 
 ## Platform Support
 
