@@ -243,31 +243,21 @@ detect_or_install_platform() {
     if [[ "${install_oc,,}" =~ ^y ]]; then
         info "Installing OpenClaw..."
 
-        # Ensure npm global installs don't require root.
-        # Always use ~/.npm-global as the install target — explicit --prefix
-        # on the install command guarantees location regardless of npm config files.
-        NPM_GLOBAL_DIR="$HOME/.npm-global"
-        mkdir -p "$NPM_GLOBAL_DIR"
-        NPM_PREFIX_CURRENT=$(npm config get prefix 2>/dev/null || echo "")
-        if [[ "$NPM_PREFIX_CURRENT" == /usr* || "$NPM_PREFIX_CURRENT" == /opt* ]]; then
-            info "Configuring user-local npm prefix (~/.npm-global) to avoid permission errors..."
-            npm config set prefix "$NPM_GLOBAL_DIR"
+        # If npm's global prefix isn't user-writable, point it somewhere that is.
+        NPM_PREFIX=$(npm config get prefix 2>/dev/null || echo "")
+        if [[ ! -w "$NPM_PREFIX" ]]; then
+            NPM_PREFIX="$HOME/.npm-global"
+            mkdir -p "$NPM_PREFIX"
+            npm config set prefix "$NPM_PREFIX"
+            info "Using user-local npm prefix: $NPM_PREFIX"
         fi
-        export PATH="$NPM_GLOBAL_DIR/bin:$PATH"
-        hash -r 2>/dev/null || true  # flush bash command cache
-        # Persist to shell RC so openclaw is on PATH in future sessions
-        for RC in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do
-            if [[ -f "$RC" ]] && ! grep -q "npm-global" "$RC" 2>/dev/null; then
-                echo '' >> "$RC"
-                echo '# npm global (AgentForge)' >> "$RC"
-                echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> "$RC"
-            fi
-        done
-
-        npm install -g openclaw --prefix "$NPM_GLOBAL_DIR"
-        # Use explicit path — never rely on bash PATH cache after prefix change
-        OPENCLAW_CMD="$NPM_GLOBAL_DIR/bin/openclaw"
+        export PATH="$(npm config get prefix)/bin:$PATH"
         hash -r 2>/dev/null || true
+
+        npm install -g openclaw
+        hash -r 2>/dev/null || true
+        OPENCLAW_CMD="$(command -v openclaw 2>/dev/null || echo '')"
+        [[ -z "$OPENCLAW_CMD" ]] && fail "openclaw installed but not found on PATH. Try: source ~/.bashrc"
         ok "OpenClaw $("$OPENCLAW_CMD" --version 2>/dev/null | head -1) installed"
         PLATFORM="openclaw"
 
