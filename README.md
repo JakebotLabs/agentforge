@@ -11,6 +11,13 @@ Give your AI agent persistent memory, self-healing health monitoring, and a mana
 curl -fsSL https://agentsforge.dev/install.sh | bash
 ```
 
+**What happens:**
+- 🔧 Auto-installs prerequisites (git, Python 3.12, Node.js) on Ubuntu/Debian
+- 🤖 Detects or installs [OpenClaw](https://openclaw.dev) (free AI agent platform)
+- 🔑 Guides you through model selection (`openclaw configure --section model`)
+- 🚀 Initializes and starts AgentForge automatically
+- ✅ Confirms your bot is running — `openclaw chat` to test
+
 ## What You Get
 
 | Layer | Description | Status |
@@ -29,15 +36,23 @@ curl -fsSL https://agentsforge.dev/install.sh | bash
 curl -fsSL https://agentsforge.dev/install.sh | bash
 ```
 
+The installer walks you through model selection — have your API key ready.
+
 ### Manual Install
 
 ```bash
+# Install OpenClaw first (recommended platform)
+npm install -g openclaw
+openclaw configure --section model
+
+# Then install AgentForge
 git clone https://github.com/JakebotLabs/agentforge
 cd agentforge
 python3 -m venv venv
 source venv/bin/activate
 pip install -e .
-agentforge init
+agentforge init --platform openclaw
+agentforge start
 ```
 
 ## Commands
@@ -120,9 +135,10 @@ AgentForge works with any Python-based agent:
 
 ## Requirements
 
-- Python 3.10+
-- Linux, macOS, or WSL
+- Linux (Ubuntu/Debian auto-install), macOS (Homebrew check), or WSL2
 - ~500MB disk space
+- An API key from Anthropic, OpenAI, xAI, or Groq (for AI model)
+- **Ubuntu/Debian:** Prerequisites (Python 3.12, Node.js, git) installed automatically
 
 ## Documentation
 

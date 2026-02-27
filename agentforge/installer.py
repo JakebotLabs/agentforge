@@ -248,5 +248,74 @@ def check_components(config: AgentForgeConfig) -> dict:
         "message": "CodeBot + OpusBot ready" if pipeline_check["installed"] else "🔒 Pro feature (optional)",
         "fix": None
     }
-    
+
+    # OpenClaw platform check (only when platform=openclaw)
+    openclaw_cmd = shutil.which("openclaw")
+    openclaw_json = Path.home() / ".openclaw" / "openclaw.json"
+
+    if config.platform == "openclaw" or openclaw_cmd:
+        # 1. openclaw command exists
+        if not openclaw_cmd:
+            checks["OpenClaw CLI"] = {
+                "ok": False,
+                "message": "openclaw command not found",
+                "fix": "Install OpenClaw: npm install -g openclaw"
+            }
+        else:
+            try:
+                result = subprocess.run(["openclaw", "--version"], capture_output=True, text=True, timeout=5)
+                oc_version = result.stdout.strip() or result.stderr.strip() or "installed"
+                checks["OpenClaw CLI"] = {
+                    "ok": True,
+                    "message": oc_version,
+                    "fix": None
+                }
+            except Exception:
+                checks["OpenClaw CLI"] = {
+                    "ok": True,
+                    "message": "Found (version check failed)",
+                    "fix": None
+                }
+
+        # 2. ~/.openclaw/openclaw.json exists
+        if not openclaw_json.exists():
+            checks["OpenClaw config"] = {
+                "ok": False,
+                "message": f"{openclaw_json} not found",
+                "fix": "Run: openclaw configure  (or: openclaw configure --section model)"
+            }
+        else:
+            # 3. agents.defaults.model.primary is set
+            try:
+                import json as _json
+                with open(openclaw_json) as _f:
+                    _oc_cfg = _json.load(_f)
+
+                _primary = (
+                    _oc_cfg
+                    .get("agents", {})
+                    .get("defaults", {})
+                    .get("model", {})
+                    .get("primary", "")
+                )
+
+                if _primary:
+                    checks["OpenClaw config"] = {
+                        "ok": True,
+                        "message": f"Model configured: {_primary}",
+                        "fix": None
+                    }
+                else:
+                    checks["OpenClaw config"] = {
+                        "ok": False,
+                        "message": "No primary model set (agents.defaults.model.primary is empty)",
+                        "fix": "Run: openclaw configure --section model  — then pick your AI provider/model"
+                    }
+            except Exception as e:
+                checks["OpenClaw config"] = {
+                    "ok": False,
+                    "message": f"Could not parse openclaw.json: {str(e)[:60]}",
+                    "fix": "Run: openclaw configure --section model"
+                }
+
     return checks
