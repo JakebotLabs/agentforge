@@ -345,6 +345,8 @@ ok "agentforge $INSTALLED_VERSION"
 # ── 7. Initialize ─────────────────────────────────────────────
 echo ""
 "$LOCAL_BIN/agentforge" init --platform "$PLATFORM" --no-install
+ok "Workspace bootstrap complete — bot is aware of its stack"
+info "Next: edit ~/.agentforge/workspace/SOUL.md to define your mission"
 
 # ── 8. Start services ─────────────────────────────────────────
 echo ""

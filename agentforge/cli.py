@@ -102,6 +102,40 @@ def init(platform: str, workspace: str, install: bool):
     save_config(config)
     console.print(f"\n[green]✓ Config saved to {DEFAULT_CONFIG_PATH}[/]")
     console.print("[green]✓ AgentForge initialized![/]")
+
+    # ── Bootstrap workspace awareness files ───────────────────────────────
+    from .bootstrap import bootstrap_workspace
+
+    has_mailbox = (
+        (Path.home() / ".openclaw" / "mailbox").exists()
+        or (Path.home() / ".agentforge" / "mailbox").exists()
+    )
+    mailbox_path = Path.home() / ".openclaw" / "mailbox" if has_mailbox else None
+
+    _agentforge_home = Path.home() / ".agentforge"
+
+    console.print("\n[bold blue]📝 Seeding workspace awareness...[/]")
+    created = bootstrap_workspace(
+        platform=platform,
+        workspace_path=config.workspace,
+        has_memory=True,
+        has_healthkit=True,
+        has_mailbox=has_mailbox,
+        has_dashboard=True,
+        mailbox_path=mailbox_path,
+        agentforge_home=_agentforge_home,
+    )
+
+    if created:
+        for f in created:
+            console.print(f"  [green]✓[/] Generated {f}")
+        console.print("\n  [dim]Edit SOUL.md to define your mission.[/]")
+    else:
+        console.print(
+            "  [dim]Workspace files already exist — skipping "
+            "(won't overwrite your customizations)[/]"
+        )
+
     console.print("\nRun [bold]agentforge start[/] to launch all services.")
 
 
@@ -225,6 +259,91 @@ def pipeline(bot: str, task: str):
 
     result = sp.run(cmd, env=env)
     sys.exit(result.returncode)
+
+
+@cli.group()
+def memory():
+    """Manage AgentForge persistent memory."""
+    pass
+
+
+@memory.command(name="status")
+def memory_status():
+    """Check memory system sync status."""
+    config = load_config()
+    console.print("[bold blue]🧠 Checking memory status...[/]")
+
+    # Locate the vector_memory package inside the workspace
+    venv_python = config.memory.path.parent / "vector_memory" / "venv" / "bin" / "python"
+    script = config.memory.path.parent / "vector_memory" / "auto_retrieve.py"
+
+    # Fallback: try config.memory.path directly (it might already be vector_memory/)
+    if not script.exists():
+        venv_python = config.memory.path / "venv" / "bin" / "python"
+        script = config.memory.path / "auto_retrieve.py"
+
+    if not script.exists():
+        console.print("  [yellow]⚠ Memory script not found.[/]")
+        console.print(f"  Expected: {script}")
+        console.print("  Run [bold]agentforge install[/] to set up persistent memory.")
+        return
+
+    python_cmd = str(venv_python) if venv_python.exists() else sys.executable
+
+    import subprocess as sp
+    result = sp.run(
+        [python_cmd, str(script), "--status"],
+        capture_output=True, text=True,
+        cwd=str(script.parent),
+    )
+    output = (result.stdout + result.stderr).strip()
+
+    if output:
+        console.print(output)
+    else:
+        console.print("  [yellow]No output from memory status check.[/]")
+
+    if result.returncode != 0:
+        console.print(
+            "\n  [yellow]Memory may be out of sync. "
+            "Run [bold]agentforge memory sync[/] to re-index.[/]"
+        )
+    else:
+        console.print("\n  [green]✓ Memory is in sync.[/]")
+
+
+@memory.command(name="sync")
+def memory_sync():
+    """Re-index memory system (ChromaDB + NetworkX)."""
+    config = load_config()
+    console.print("[bold blue]🔄 Syncing memory...[/]")
+
+    # Locate the indexer
+    venv_python = config.memory.path.parent / "vector_memory" / "venv" / "bin" / "python"
+    script = config.memory.path.parent / "vector_memory" / "indexer.py"
+
+    if not script.exists():
+        venv_python = config.memory.path / "venv" / "bin" / "python"
+        script = config.memory.path / "indexer.py"
+
+    if not script.exists():
+        console.print("  [yellow]⚠ Indexer not found.[/]")
+        console.print(f"  Expected: {script}")
+        console.print("  Run [bold]agentforge install[/] to set up persistent memory.")
+        return
+
+    python_cmd = str(venv_python) if venv_python.exists() else sys.executable
+
+    import subprocess as sp
+    console.print("  Running indexer (this may take a moment)...")
+    result = sp.run(
+        [python_cmd, str(script)],
+        cwd=str(script.parent),
+    )
+    if result.returncode == 0:
+        console.print("  [green]✓ Memory sync complete.[/]")
+    else:
+        console.print("  [red]✗ Indexer exited with errors. Check output above.[/]")
 
 
 if __name__ == "__main__":
