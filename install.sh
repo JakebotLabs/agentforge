@@ -9,7 +9,7 @@
 set -euo pipefail
 
 AGENTFORGE_HOME="${AGENTFORGE_HOME:-$HOME/.agentforge}"
-REPO_URL="https://github.com/Jakebot-ops/agentforge.git"
+REPO_URL="https://github.com/JakebotLabs/agentforge.git"
 MIN_PYTHON_MINOR=10   # Python 3.10+ required
 
 # ── Colors ────────────────────────────────────────────────────

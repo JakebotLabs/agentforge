@@ -38,11 +38,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Jakebot-ops/agentforge.git"
+    "url": "git+https://github.com/JakebotLabs/agentforge.git"
   },
   "homepage": "https://agentsforge.dev",
   "bugs": {
-    "url": "https://github.com/Jakebot-ops/agentforge/issues"
+    "url": "https://github.com/JakebotLabs/agentforge/issues"
   },
   "engines": {
     "node": ">=16.0.0"

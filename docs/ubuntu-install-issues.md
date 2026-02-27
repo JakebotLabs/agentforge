@@ -26,7 +26,7 @@ sudo apt update
 sudo apt install -y python3-pip python3.12-venv git
 
 # Clone repo
-git clone https://github.com/Jakebot-ops/agentforge.git ~/.agentforge-install
+git clone https://github.com/JakebotLabs/agentforge.git ~/.agentforge-install
 cd ~/.agentforge-install
 
 # Create venv and install

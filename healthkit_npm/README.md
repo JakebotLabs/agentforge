@@ -246,4 +246,4 @@ MIT — Free to use, modify, and distribute.
 
 ---
 
-Built by [Jakebot Labs](https://jakebotlabs.com) · [AgentForge](https://agentsforge.dev) · [GitHub](https://github.com/Jakebot-ops/agentforge)
+Built by [Jakebot Labs](https://jakebotlabs.com) · [AgentForge](https://agentsforge.dev) · [GitHub](https://github.com/JakebotLabs/agentforge)

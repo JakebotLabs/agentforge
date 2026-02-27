@@ -9,7 +9,7 @@ As a Builder ($25+) sponsor, you now have access to the **Dev Pipeline** — Cod
 After sponsoring, GitHub automatically grants you access to the private repo. You should receive an email invitation within a few minutes.
 
 **If you don't see the email:**
-1. Go to [github.com/Jakebot-ops/agentforge-pipeline](https://github.com/Jakebot-ops/agentforge-pipeline)
+1. Go to [github.com/JakebotLabs/agentforge-pipeline](https://github.com/JakebotLabs/agentforge-pipeline)
 2. If you see a 404 page, the invitation is pending — check your GitHub notifications
 3. Click "Accept invitation"
 

@@ -3,7 +3,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-PIPELINE_REPO = "https://github.com/Jakebot-ops/agentforge.git"
+PIPELINE_REPO = "https://github.com/JakebotLabs/agentforge.git"
 PIPELINE_SUBDIR = "pipeline"  # We'll create this in the main repo
 
 def check_pipeline(workspace: Path) -> dict:
@@ -23,5 +23,5 @@ def get_pipeline_status(workspace: Path) -> dict:
     return {
         "healthy": None,   # None = not an error, just not available
         "status": "Pro feature",
-        "details": "github.com/sponsors/Jakebot-ops",
+        "details": "github.com/sponsors/JakebotLabs",
     }
