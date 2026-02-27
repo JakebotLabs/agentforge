@@ -255,9 +255,8 @@ detect_or_install_platform() {
         hash -r 2>/dev/null || true
 
         npm install -g openclaw
-        hash -r 2>/dev/null || true
-        OPENCLAW_CMD="$(command -v openclaw 2>/dev/null || echo '')"
-        [[ -z "$OPENCLAW_CMD" ]] && fail "openclaw installed but not found on PATH. Try: source ~/.bashrc"
+        OPENCLAW_CMD="$NPM_PREFIX/bin/openclaw"
+        [[ ! -x "$OPENCLAW_CMD" ]] && fail "openclaw installed but binary not found at $OPENCLAW_CMD — check npm logs"
         ok "OpenClaw $("$OPENCLAW_CMD" --version 2>/dev/null | head -1) installed"
         PLATFORM="openclaw"
 
