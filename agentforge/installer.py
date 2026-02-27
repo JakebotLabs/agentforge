@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 import sys
 from .config import AgentForgeConfig
+from .platform import get_venv_pip
 
 
 def install_all_components(config: AgentForgeConfig, console) -> dict:
@@ -56,7 +57,7 @@ def install_all_components(config: AgentForgeConfig, console) -> dict:
             if not venv_path.exists():
                 subprocess.run([sys.executable, "-m", "venv", str(venv_path)],
                              capture_output=True)
-            pip = venv_path / "bin" / "pip"
+            pip = get_venv_pip(target)
             subprocess.run([str(pip), "install", "-q", "-r", str(req_file)],
                          capture_output=True)
             console.print(f"    ✅ {name} dependencies installed")

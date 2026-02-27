@@ -1,5 +1,6 @@
 """AgentForge CLI entry point."""
 
+import sys
 import click
 from pathlib import Path
 from rich.console import Console
@@ -8,6 +9,14 @@ from rich.prompt import Prompt
 from .config import load_config, save_config, AgentForgeConfig, DEFAULT_CONFIG_PATH
 from .installer import install_components, check_components, install_all_components
 from .runner import start_services, stop_services, get_status
+
+# Force UTF-8 output on Windows to avoid cp1252 encoding errors with Rich
+if sys.platform == "win32":
+    import io
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 console = Console()
 
