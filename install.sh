@@ -112,7 +112,7 @@ install_prerequisites() {
         # Node.js 20.x (via NodeSource if npm missing)
         if ! command -v npm &>/dev/null; then
             info "Installing Node.js 20.x..."
-            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - >/dev/null 2>&1
+            curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - >/dev/null 2>&1
             sudo apt-get install -y -qq nodejs
         fi
 
@@ -179,6 +179,13 @@ PYTHON_VERSION=$("$PYTHON_CMD" --version 2>&1)
 ok "Python: $PYTHON_VERSION"
 ok "git: $(git --version)"
 ok "npm: v$(npm --version 2>/dev/null || echo 'unknown')"
+
+# Verify Node.js >= 22 (openclaw requirement)
+NODE_MAJOR=$(node -e "process.stdout.write(String(process.versions.node.split('.')[0]))" 2>/dev/null || echo "0")
+if [[ "$NODE_MAJOR" -lt 22 ]]; then
+    fail "Node.js 22+ required (found $(node --version 2>/dev/null)). The installer will use Node 22 on next run — please re-run the installer."
+fi
+ok "Node.js: $(node --version)"
 
 # ── 2. Handle existing installation ───────────────────────────
 if [[ -d "$AGENTFORGE_HOME/repo/.git" ]]; then
