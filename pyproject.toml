@@ -1,5 +1,5 @@
 [project]
-name = "agentforge"
+name = "agentsforge"
 version = "0.1.0"
 description = "Complete AI agent infrastructure in one command"
 readme = "README.md"
