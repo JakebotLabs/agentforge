@@ -100,6 +100,7 @@ class TestCheckProcessExists:
 
 
 class TestPopenDetached:
+    @pytest.mark.skipif(sys.platform != "win32", reason="CREATE_NEW_PROCESS_GROUP only exists on Windows")
     def test_windows_uses_creation_flags(self):
         with patch("agentforge.platform.IS_WINDOWS", True), \
              patch("subprocess.Popen") as mock_popen:

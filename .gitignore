@@ -28,3 +28,10 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+
+# NPM (healthkit_npm)
+healthkit_npm/dist/
+healthkit_npm/node_modules/

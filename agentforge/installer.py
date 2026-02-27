@@ -16,6 +16,7 @@ def install_all_components(config: AgentForgeConfig, console) -> dict:
     REPOS = {
         "agent-memory-core": ("https://github.com/JakebotLabs/agent-memory-core.git", False),
         "agent-healthkit": ("https://github.com/JakebotLabs/agent-healthkit.git", False),
+        "agent-mailbox": ("https://github.com/JakebotLabs/agent-mailbox.git", False),
         "jakebot-dashboard": ("https://github.com/JakebotLabs/jakebot-dashboard.git", False),
         "pipeline": ("https://github.com/JakebotLabs/agentforge-pipeline.git", True),  # Pro feature
     }
