@@ -20,9 +20,10 @@ if sys.platform == "win32":
 
 console = Console()
 
-# Only openclaw is implemented. langchain/autogen/standalone are future.
 PLATFORMS = {
-    "1": ("openclaw", "OpenClaw — Full-featured agent runtime (recommended)"),
+    "1": ("openclaw",    "OpenClaw    — Full-featured agent runtime (recommended)"),
+    "2": ("langchain",   "LangChain   — LangChain / LangGraph agent projects"),
+    "3": ("standalone",  "Standalone  — Raw Python, no framework required"),
 }
 
 
@@ -34,21 +35,26 @@ def cli():
 
 
 @cli.command()
-@click.option("--platform", type=click.Choice(["openclaw"]), default=None)  # langchain/standalone: future — not yet implemented
+@click.option(
+    "--platform",
+    type=click.Choice(["openclaw", "langchain", "standalone"]),
+    default=None,
+    help="Agent platform to integrate with.",
+)
 @click.option("--workspace", type=click.Path(), default=None)
 @click.option("--install/--no-install", default=True, help="Install all components")
 def init(platform: str, workspace: str, install: bool):
     """Initialize AgentForge in the current environment."""
     console.print("[bold blue]⚒️  Initializing AgentForge...[/]")
-    
+
     # Interactive platform selection if not provided
     if platform is None:
         console.print("\n[bold]Select your agent platform:[/]\n")
         for key, (name, desc) in PLATFORMS.items():
             console.print(f"  [cyan]{key}[/]) {desc}")
         console.print()
-        
-        choice = Prompt.ask("Enter choice", choices=["1"], default="1")
+
+        choice = Prompt.ask("Enter choice", choices=list(PLATFORMS.keys()), default="1")
         platform = PLATFORMS[choice][0]
         console.print(f"\n  Selected: [green]{platform}[/]\n")
     
@@ -73,6 +79,31 @@ def init(platform: str, workspace: str, install: bool):
             config.workspace = Path(workspace) if workspace else Path.home() / ".agentforge"
             config.memory.path = config.workspace / "components" / "agent-memory-core"
             config.healthkit.path = config.workspace / "components" / "agent-healthkit"
+
+    elif platform == "langchain":
+        from .adapters.langchain import LangChainAdapter
+        lc_adapter = LangChainAdapter()
+        if not lc_adapter.detect():
+            console.print(
+                "  [yellow]⚠ LangChain not detected in current environment.[/]\n"
+                "  Install it first:  [bold]pip install langchain[/]\n"
+                "  Then re-run:       [bold]agentforge init --platform langchain[/]"
+            )
+        lc_ws = lc_adapter.get_workspace()
+        config.workspace = Path(workspace) if workspace else lc_ws
+        config.memory.path = config.workspace / "components" / "agent-memory-core"
+        config.healthkit.path = config.workspace / "components" / "agent-healthkit"
+        console.print(f"  [green]✓ LangChain workspace:[/] {lc_ws}")
+
+    elif platform == "standalone":
+        from .adapters.standalone import StandaloneAdapter
+        sa_adapter = StandaloneAdapter()
+        sa_ws = sa_adapter.get_workspace()
+        config.workspace = Path(workspace) if workspace else sa_ws
+        config.memory.path = config.workspace / "components" / "agent-memory-core"
+        config.healthkit.path = config.workspace / "components" / "agent-healthkit"
+        console.print(f"  [green]✓ Standalone workspace:[/] {sa_ws}")
+
     else:
         workspace_path = Path(workspace) if workspace else Path.home() / ".agentforge"
         config.workspace = workspace_path
@@ -96,6 +127,29 @@ def init(platform: str, workspace: str, install: bool):
         for component, status in results.items():
             icon = _component_icon(status["installed"])
             console.print(f"  {icon} {component}: {status['message']}")
+
+    # Platform-specific injection: drop bridge/helper files into framework workspace
+    if platform == "langchain":
+        from .adapters.langchain import LangChainAdapter
+        _lc = LangChainAdapter()
+        if _lc.inject_memory(config.memory.path):
+            console.print(f"  [green]✓ LangChain memory bridge written:[/] {_lc.workspace_path / 'memory_bridge.py'}")
+        if _lc.inject_healthkit(config.healthkit.path):
+            console.print(f"  [green]✓ LangChain HealthKit callbacks written:[/] {_lc.workspace_path / 'healthkit_callbacks.py'}")
+        example = _lc.write_example()
+        console.print(f"  [green]✓ Example agent written:[/] {example}")
+        console.print("\n  [dim]Import memory_bridge and healthkit_callbacks from your LangChain project.[/]")
+
+    elif platform == "standalone":
+        from .adapters.standalone import StandaloneAdapter
+        _sa = StandaloneAdapter()
+        if _sa.inject_memory(config.memory.path):
+            console.print(f"  [green]✓ Standalone MemoryStore written:[/] {_sa.workspace_path / 'memory_setup.py'}")
+        if _sa.inject_healthkit(config.healthkit.path):
+            console.print(f"  [green]✓ Standalone HealthKit written:[/] {_sa.workspace_path / 'healthkit_setup.py'}")
+        example = _sa.write_example()
+        console.print(f"  [green]✓ Example agent written:[/] {example}")
+        console.print("\n  [dim]Import MemoryStore and HealthKit from your Python project.[/]")
     
     save_config(config)
     console.print(f"\n[green]✓ Config saved to {DEFAULT_CONFIG_PATH}[/]")
