@@ -10,7 +10,9 @@ DEFAULT_CONFIG_PATH = Path.home() / ".agentforge" / "agentforge.yml"
 
 class MemoryConfig(BaseModel):
     enabled: bool = True
-    path: Path = Path.home() / ".openclaw/workspace/vector_memory"
+    # Default: ~/.agentforge/workspace/vector_memory
+    # Overridden by cli.py init() when OpenClaw workspace is detected
+    path: Path = Path.home() / ".agentforge" / "workspace" / "vector_memory"
 
     @field_serializer('path')
     def serialize_path(self, path: Path) -> str:
@@ -19,7 +21,9 @@ class MemoryConfig(BaseModel):
 
 class HealthkitConfig(BaseModel):
     enabled: bool = True
-    path: Path = Path.home() / ".openclaw/workspace/healthkit_internal"
+    # Default: ~/.agentforge/workspace/healthkit_internal
+    # Overridden by cli.py init() when OpenClaw workspace is detected
+    path: Path = Path.home() / ".agentforge" / "workspace" / "healthkit_internal"
     mode: str = "observe"  # observe | heal
 
     @field_serializer('path')
@@ -36,7 +40,9 @@ class DashboardConfig(BaseModel):
 class AgentForgeConfig(BaseModel):
     version: str = "1"
     platform: str = "openclaw"  # openclaw | langchain | autogen | standalone
-    workspace: Path = Path.home() / ".openclaw/workspace"
+    # Default: ~/.agentforge/workspace — safe for fresh installs with no OpenClaw
+    # Overridden by cli.py init() when OpenClaw workspace is detected
+    workspace: Path = Path.home() / ".agentforge" / "workspace"
     memory: MemoryConfig = MemoryConfig()
     healthkit: HealthkitConfig = HealthkitConfig()
     dashboard: DashboardConfig = DashboardConfig()

@@ -77,12 +77,15 @@ def install_components(config: AgentForgeConfig) -> dict:
     else:
         results["agent-memory-core"] = {"installed": False, "message": "Not found. Run setup."}
     
-    # Check healthkit
+    # Check healthkit (optional — not yet on PyPI)
     healthkit_path = config.healthkit.path
     if healthkit_path.exists() and (healthkit_path / "monitor.py").exists():
         results["agent-healthkit"] = {"installed": True, "message": f"Found at {str(healthkit_path).strip()}"}
     else:
-        results["agent-healthkit"] = {"installed": False, "message": "Not found."}
+        results["agent-healthkit"] = {
+            "installed": None,  # None = optional / not a hard failure
+            "message": "Not installed (optional — install from source when ready)"
+        }
     
     # Check dashboard
     dashboard_installed = False
@@ -223,13 +226,13 @@ def check_components(config: AgentForgeConfig) -> dict:
         "fix": "Run the memory indexer"
     }
     
-    # Healthkit
+    # Healthkit (optional — not yet on PyPI, install from source)
     healthkit_path = config.healthkit.path
     monitor_exists = (healthkit_path / "monitor.py").exists()
     checks["HealthKit"] = {
-        "ok": monitor_exists,
-        "message": "Monitor found" if monitor_exists else "Not installed",
-        "fix": "Install agent-healthkit"
+        "ok": True,  # Not having it is not a blocking error — it's optional
+        "message": "Active (observe mode)" if monitor_exists else "Not installed (optional)",
+        "fix": None if monitor_exists else "git clone https://github.com/JakebotLabs/agent-healthkit.git && pip install -e agent-healthkit"
     }
     
     # Dashboard
