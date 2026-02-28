@@ -82,7 +82,7 @@ def install_components(config: AgentForgeConfig) -> dict:
     # Check memory system — prefer package check, fall back to directory check
     # (directory check supports Jake's existing OpenClaw workspace install)
     memory_path = config.memory.path
-    memory_pkg = _venv_pkg_installed("agent-memory-core")
+    memory_pkg = _venv_pkg_installed("agent-memory-core") or _venv_pkg_installed("chromadb")
     memory_dir = memory_path.exists() and (memory_path / "chroma_db").exists()
     if memory_pkg or memory_dir:
         how = "pip package" if memory_pkg else f"workspace at {memory_path}"
@@ -241,18 +241,20 @@ def check_components(config: AgentForgeConfig) -> dict:
 
     # Memory system — package check + directory fallback (supports existing OpenClaw installs)
     memory_path = config.memory.path
-    memory_pkg = _venv_pkg_installed("agent-memory-core")
+    memory_named_pkg = _venv_pkg_installed("agent-memory-core")
+    memory_pkg = memory_named_pkg or _venv_pkg_installed("chromadb")
     chroma_exists = (memory_path / "chroma_db").exists()
     memory_ok = memory_pkg or chroma_exists
     checks["Memory (ChromaDB)"] = {
         "ok": memory_ok,
         "message": (
-            "Ready (agent-memory-core)" if memory_pkg
+            f"Ready{' — database active' if chroma_exists else ' (no data yet — send a message to start)'}"
+            if memory_pkg
             else f"Database ready at {memory_path}" if chroma_exists
-            else "Not initialized"
+            else "Not installed"
         ),
-        "hint": "pip install agent-memory-core  (then re-run: agentforge init)" if not memory_ok else None,
-        "cmd": None  # Requires re-init after install — skip auto-fix
+        "hint": "pip install agent-memory-core" if not memory_ok else None,
+        "cmd": None
     }
 
     # Healthkit — package check + directory fallback (supports existing OpenClaw installs)

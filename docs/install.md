@@ -29,7 +29,7 @@ curl -fsSL https://agentsforge.dev/install.sh | bash
 → agentforge init --platform openclaw
 → agentforge start
 → ✅ "AgentForge is installed and running!"
-→ Test: openclaw chat
+→ Test: agentforge doctor
 ```
 
 ### Install Options

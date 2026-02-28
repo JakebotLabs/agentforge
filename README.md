@@ -16,7 +16,7 @@ curl -fsSL https://agentsforge.dev/install.sh | bash
 - 🤖 Detects or installs [OpenClaw](https://openclaw.dev) (free AI agent platform)
 - 🔑 Guides you through model selection (`openclaw configure --section model`)
 - 🚀 Initializes and starts AgentForge automatically
-- ✅ Confirms your bot is running — `openclaw chat` to test
+- ✅ Confirms your bot is running — `agentforge status` to verify
 
 ## What You Get
 

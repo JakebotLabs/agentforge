@@ -377,7 +377,7 @@ fi
 ok "Python environment ready"
 
 info "Installing memory layer (ChromaDB + NetworkX) — this takes 2-4 minutes on first run..."
-"$AGENTFORGE_HOME/venv/bin/pip" install -q chromadb sentence-transformers networkx 2>&1 | tail -1
+"$AGENTFORGE_HOME/venv/bin/pip" install -q "git+https://github.com/JakebotLabs/agent-memory-core.git" 2>&1 | tail -1
 ok "Memory layer ready"
 
 info "Installing health monitoring (agent-healthkit)..."
@@ -525,7 +525,7 @@ OPTIONAL_SHOWN=false
 if [[ "$PLATFORM" == "openclaw" ]]; then
     echo -e "${BOLD}Optional next steps:${RESET}"
     OPTIONAL_SHOWN=true
-    echo "  openclaw chat        # test your bot interactively"
+    echo "  openclaw message send --channel <telegram|discord|...> --target <id> --message \"hello\"  # test your bot"
     echo "  openclaw status      # check openclaw status"
 fi
 
