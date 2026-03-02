@@ -186,9 +186,11 @@ if [[ "$NODE_MAJOR" -lt 22 ]]; then
     if command -v apt-get &>/dev/null; then
         curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - >/dev/null 2>&1
         sudo apt-get install -y -qq nodejs >/dev/null 2>&1
-        # Refresh PATH
-        hash -r
-        NODE_MAJOR=$(node -e "process.stdout.write(String(process.versions.node.split('.')[0]))" 2>/dev/null || echo "0")
+        # NodeSource installs to /usr/bin — force PATH refresh and use explicit path
+        export PATH="/usr/bin:$PATH"
+        hash -r 2>/dev/null || true
+        NODE_BIN=$(command -v node 2>/dev/null || echo "/usr/bin/node")
+        NODE_MAJOR=$("$NODE_BIN" -e "process.stdout.write(String(process.versions.node.split('.')[0]))" 2>/dev/null || echo "0")
         if [[ "$NODE_MAJOR" -lt 22 ]]; then
             fail "Node.js upgrade failed. Please install Node.js 22+ manually and re-run."
         fi
