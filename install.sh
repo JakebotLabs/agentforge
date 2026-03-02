@@ -183,7 +183,7 @@ ok "npm: v$(npm --version 2>/dev/null || echo 'unknown')"
 NODE_MAJOR=$(node -e "process.stdout.write(String(process.versions.node.split('.')[0]))" 2>/dev/null || echo "0")
 if [[ "$NODE_MAJOR" -lt 22 ]]; then
     warn "Node.js 22+ required (found $(node --version 2>/dev/null)). Upgrading via NodeSource..."
-    if [[ "$PLATFORM_DETECTED" == "ubuntu" || "$PLATFORM_DETECTED" == "debian" ]] || command -v apt-get &>/dev/null; then
+    if command -v apt-get &>/dev/null; then
         curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - >/dev/null 2>&1
         sudo apt-get install -y -qq nodejs >/dev/null 2>&1
         # Refresh PATH
