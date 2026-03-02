@@ -320,7 +320,10 @@ detect_or_install_platform() {
             echo "  Then come back here and press Enter to continue..."
             echo ""
             # Read from /dev/tty directly — works even when stdin is a pipe (curl|bash)
-            if [[ -e /dev/tty ]]; then
+            if [[ "${CI:-}" == "true" ]]; then
+                # In CI: skip configure gate entirely — no tty, no user to prompt
+                warn "CI mode — skipping openclaw configure gate. Configure manually after install."
+            elif [[ -e /dev/tty ]]; then
                 while [[ ! -f "$HOME/.openclaw/openclaw.json" ]]; do
                     read -rp "  Press Enter once 'openclaw configure' is complete... " _ < /dev/tty
                     if [[ ! -f "$HOME/.openclaw/openclaw.json" ]]; then
