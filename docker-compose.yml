@@ -3,7 +3,7 @@ version: "3.8"
 services:
   dashboard:
     build:
-      context: ../jakebot-dashboard
+      context: ../agentforge-dashboard
       dockerfile: Dockerfile
     ports:
       - "7842:7842"
