@@ -1,157 +1,137 @@
 # AgentForge
 
-[![CI](https://github.com/JakebotLabs/agentforge/actions/workflows/test.yml/badge.svg)](https://github.com/JakebotLabs/agentforge/actions)
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/JakebotLabs?style=flat&logo=github&label=Sponsor)](https://github.com/sponsors/JakebotLabs)
+**Complete AI agent infrastructure in one command — works with any Python agent framework.**
 
-**Complete AI agent infrastructure in one command.**
-
-Give your AI agent persistent memory, self-healing health monitoring, and a management dashboard — in under 60 seconds.
+Persistent memory, health monitoring, and a live dashboard. Drop it into your existing agent stack or run it standalone.
 
 ```bash
-curl -fsSL https://agentsforge.dev/install.sh | bash
+pip install agentsforge
+agentforge init
+agentforge start
 ```
 
-**What happens:**
-- 🔧 Auto-installs prerequisites (git, Python 3.12, Node.js) on Ubuntu/Debian
-- 🤖 Detects or installs [OpenClaw](https://openclaw.dev) (free AI agent platform)
-- 🔑 Guides you through model selection (`openclaw configure --section model`)
-- 🚀 Initializes and starts AgentForge automatically
-- ✅ Confirms your bot is running — `agentforge status` to verify
+Dashboard: http://localhost:7842
 
-## What You Get
+---
 
-| Layer | Description | Status |
-|-------|-------------|--------|
-| 🧠 **Memory** | ChromaDB vectors + NetworkX knowledge graph | ✅ Free |
-| 🩺 **Health** | Auto-monitoring + self-healing + soul drift detection | ✅ Free |
-| 📊 **Dashboard** | Web UI for memory & health management | ✅ Free |
-| 🔧 **NPM Package** | TypeScript client: `@agentsforge/healthkit` | ✅ Free |
-| ⚙️ **Dev Pipeline** | CodeBot + OpusBot autonomous coding | 🔐 [Pro](https://github.com/sponsors/JakebotLabs) |
+## Supported Platforms
+
+| Platform | Command | Notes |
+|----------|---------|-------|
+| **Standalone** | `agentforge init --platform standalone` | No framework required. Works with any Python agent. |
+| **OpenClaw** | `agentforge init --platform openclaw` | Auto-detects workspace, integrates with OpenClaw config |
+| **LangChain** | `agentforge init --platform langchain` | Hooks into LangChain memory and callback system |
+
+Default: `standalone` — works everywhere.
+
+---
 
 ## Quick Start
 
-### One-Line Install (Recommended)
-
+### Standalone (any agent framework)
 ```bash
-curl -fsSL https://agentsforge.dev/install.sh | bash
+pip install agentsforge
+agentforge init
+agentforge start
 ```
 
-The installer walks you through model selection — have your API key ready.
-
-### Manual Install
-
+### OpenClaw
 ```bash
-# Install OpenClaw first (recommended platform)
-npm install -g openclaw
-openclaw configure --section model
-
-# Then install AgentForge
-git clone https://github.com/JakebotLabs/agentforge
-cd agentforge
-python3 -m venv venv
-source venv/bin/activate
-pip install -e .
+pip install agentsforge
 agentforge init --platform openclaw
 agentforge start
 ```
 
+### LangChain
+```bash
+pip install agentsforge
+agentforge init --platform langchain --workspace ./my_agent
+agentforge start
+```
+
+### Docker
+```bash
+git clone https://github.com/JakebotLabs/agentforge
+cd agentforge
+docker-compose up -d
+```
+
+---
+
 ## Commands
 
-```bash
-agentforge init      # Initialize AgentForge (interactive platform selection)
-agentforge install   # Install/update all components
-agentforge start     # Start dashboard and services
-agentforge stop      # Stop all services
-agentforge status    # Show component status
-agentforge doctor    # Diagnose installation issues
-```
+| Command | Description |
+|---------|-------------|
+| `agentforge init [--platform]` | Initialize AgentForge (default: standalone) |
+| `agentforge start` | Start all services |
+| `agentforge stop` | Stop all services |
+| `agentforge status` | Show component status |
+| `agentforge doctor` | Diagnose installation issues |
+
+---
+
+## What's Included
+
+- **Persistent Memory** — Three-layer memory system (Markdown + ChromaDB vector search + NetworkX knowledge graph). Agents remember context across sessions without custom infrastructure.
+- **Agent HealthKit** — Runtime health monitoring. Detects context bloat, resource pressure, model failures. Observe-only by default.
+- **Dashboard** — Web UI at localhost:7842. Search memory, view health status, inspect agent state.
+
+---
 
 ## Configuration
 
-Config file: `~/.agentforge/agentforge.yml`
+Config at `~/.agentforge/agentforge.yml`:
 
 ```yaml
 version: "1"
-platform: standalone  # openclaw | langchain | autogen | standalone
-
-workspace: ~/.agentforge
-
+platform: standalone
+workspace: ~/.agentforge/data
 memory:
   enabled: true
 healthkit:
   enabled: true
-  mode: observe  # observe | heal
+  mode: observe
 dashboard:
   enabled: true
   port: 7842
 ```
 
-## Free vs Pro
+---
 
-**Free (MIT License):**
-- Persistent memory with semantic search
-- Health monitoring with auto-healing
-- Web dashboard at localhost:7842
-- Works with any agent framework
+## Why AgentForge?
 
-**Pro ($25/mo via [GitHub Sponsors](https://github.com/sponsors/JakebotLabs)):**
-- Everything in Free
-- Dev Pipeline (CodeBot + OpusBot)
-- Autonomous code writing and review
-- Private repo access
-- Priority support
+Most agent frameworks solve the intelligence problem. Almost none solve the operations problem:
 
-## TypeScript/JavaScript SDK
+- Agents forget everything between sessions
+- No visibility into what's happening at runtime
+- No standard way to detect drift, bloat, or failures
+- Every team builds their own monitoring from scratch
 
-Use AgentForge health monitoring from Node.js or browser:
-
-```bash
-npm install @agentsforge/healthkit
-```
-
-```typescript
-import { HealthKit, ClusterManager } from '@agentsforge/healthkit';
-
-// Monitor cluster health
-const kit = new HealthKit();
-const status = await kit.getStatus();
-console.log(status.drift_risk);  // "0%"
-
-// Manage clusters
-const cluster = new ClusterManager(config);
-await cluster.deploy();
-```
-
-See [@agentsforge/healthkit on npm](https://www.npmjs.com/package/@agentsforge/healthkit) for full docs.
-
-## Platform Support
-
-AgentForge works with any Python-based agent:
-
-- **OpenClaw** — Full integration
-- **LangChain** — Adapter included
-- **AutoGen** — Adapter included
-- **Standalone** — Raw Python, no framework
-
-## Requirements
-
-- Linux (Ubuntu/Debian auto-install), macOS (Homebrew check), or WSL2
-- ~500MB disk space
-- An API key from Anthropic, OpenAI, xAI, or Groq (for AI model)
-- **Ubuntu/Debian:** Prerequisites (Python 3.12, Node.js, git) installed automatically
-
-## Documentation
-
-- [Website](https://agentsforge.dev)
-- [Unlock Pipeline Guide](docs/unlock-pipeline.md) (for sponsors)
-- [Ubuntu Install Notes](docs/ubuntu-install-issues.md)
-
-## License
-
-MIT — Free to use, modify, and distribute.
-
-The Dev Pipeline is available to [GitHub Sponsors](https://github.com/sponsors/JakebotLabs) ($25/mo+).
+AgentForge is the ops layer. You bring the agent; we handle memory, health, and observability.
 
 ---
 
-Built by [Jakebot Labs](https://jakebotlabs.com) · [Sponsor](https://github.com/sponsors/JakebotLabs) · [Website](https://agentsforge.dev)
+## Python API
+
+```python
+from agentforge import AgentForge
+
+af = AgentForge(platform="standalone")
+af.init()
+
+# Store memory
+af.memory.store("user prefers concise replies")
+
+# Retrieve relevant context
+context = af.memory.search("user preferences", n_results=3)
+
+# Health check
+health = af.healthkit.check()
+print(health.grade)  # A, B, C, D, F
+```
+
+---
+
+## License
+
+MIT — [JakebotLabs](https://agentsforge.dev)
