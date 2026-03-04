@@ -1,6 +1,6 @@
 [project]
 name = "agentsforge"
-version = "0.1.0"
+version = "0.2.0"
 description = "Complete AI agent infrastructure in one command"
 readme = "README.md"
 license = "MIT"
